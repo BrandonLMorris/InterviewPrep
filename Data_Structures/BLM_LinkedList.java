@@ -1,9 +1,8 @@
-
-public class MyLinkedList<T> {
+public class BLM_LinkedList<T> {
   private int size;
   private Node head;
 
-  public MyLinkedList() {
+  public BLM_LinkedList() {
     this.size = 0;
     this.head = null;
   }

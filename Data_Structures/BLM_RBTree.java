@@ -3,7 +3,7 @@ import java.util.*;
 /**
  * A basic implementation of a binary search tree using an array
  */
-public class MyRBTree<T extends Comparable<? super T>> {
+public class BLM_RBTree<T extends Comparable<? super T>> {
   private T[] elements;
   private Node root;
 

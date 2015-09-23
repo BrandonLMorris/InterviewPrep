@@ -2,7 +2,7 @@
  * A simple implementation of a dynamically-sized array,
  * also known as vector or ArrayList
  */
-public class MyVector<T> {
+public class BLM_Vector<T> {
   private int size;
   private T[] elements;
 
