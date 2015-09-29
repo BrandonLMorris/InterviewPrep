@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
-public class OneTest {
+public class Question1Test {
   Node<Integer> intNode;
   @Before
   public void setUp() throws Exception {
@@ -72,5 +72,18 @@ public class OneTest {
       current = current.next;
     }
     System.out.println();
+  }
+
+  public static class Question2Test {
+
+    @Before
+    public void setUp() throws Exception {
+
+    }
+
+    @Test
+    public void testGetKthElemnent() throws Exception {
+
+    }
   }
 }
