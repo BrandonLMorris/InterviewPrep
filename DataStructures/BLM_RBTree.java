@@ -1,3 +1,5 @@
+package DataStructures;
+
 import java.util.*;
 
 /**
@@ -144,7 +146,7 @@ public class BLM_RBTree<T extends Comparable<? super T>> {
  * Insertion
  * 1. Insert the node in its correct postion (in the BST)
  * 2. Paint it red
- * 3. One of the following cases:
+ * 3. Chapter1 of the following cases:
  *    1. N (the node) is the root. Paint it black. Done.
  *    2. P (the parent) is black. Nothing needs to be done.
  *    3. Both P and U (the uncle) are red. Repaint P, U and 

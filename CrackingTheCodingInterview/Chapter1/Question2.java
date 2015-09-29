@@ -1,6 +1,10 @@
-import java.util.*;
+package CrackingTheCodingInterview.Chapter1;
 
-public class Two {
+import java.util.Scanner;
+
+public class Question2 {
+
+  // TODO: Substitute main w/ junit tests
   public static void main(String[] args) {
     Scanner in = new Scanner(System.in);
 

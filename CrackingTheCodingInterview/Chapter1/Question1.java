@@ -1,12 +1,16 @@
-import java.util.*;
+package CrackingTheCodingInterview.Chapter1;
 
-public class One {
+import java.util.Scanner;
+
+public class Question1 {
+
+  // TODO: Substitute main with junit tests
   public static void main(String[] args) {
     Scanner in = new Scanner(System.in);
     System.out.println("This program determines if a string is made " +
         "up of all unique characters.");
     System.out.println("Press Ctrl-c to quit");
-    System.out.println("Note that 'a' and 'A' are considered disctinct");
+    System.out.println("Note that 'a' and 'A' are considered distinct");
     while (true) {
       String str = in.nextLine();
       System.out.println(isUniqueChars(str));

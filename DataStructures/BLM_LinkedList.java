@@ -1,3 +1,5 @@
+package DataStructures;
+
 public class BLM_LinkedList<T> {
   private int size;
   private Node head;
@@ -23,7 +25,8 @@ public class BLM_LinkedList<T> {
   // Determine if list contains an element
   public boolean contains(T elem) {
     Node current = head;
-
+    // TODO: Complete method body
+    return false;
   }
 
   private class Node {

@@ -1,6 +1,8 @@
-import java.util.*;
+package CrackingTheCodingInterview.Chapter1;
 
-public class Six {
+import java.util.Scanner;
+
+public class Question6 {
   public static void main(String[] args) {
     /*
      * Original problem is:

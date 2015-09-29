@@ -1,3 +1,7 @@
+package DataStructures;
+
+import java.util.Arrays;
+
 /**
  * A simple implementation of a dynamically-sized array,
  * also known as vector or ArrayList
@@ -8,7 +12,7 @@ public class BLM_Vector<T> {
 
 
   // Constructor with initial capacity
-  public MyVector(int capacity) {
+  public BLM_Vector(int capacity) {
 
     // Minimal error checking, simply persists
     if (capacity <= 0) {
@@ -26,7 +30,7 @@ public class BLM_Vector<T> {
   }
 
   // Constructor w/o initial capacity
-  public MyVector() {
+  public BLM_Vector() {
     this(1);
   }
 
@@ -104,7 +108,7 @@ public class BLM_Vector<T> {
 
   // A driver to test the class with
   public void driver() {
-    MyVector<String> testVect = new MyVector<String>();
+    BLM_Vector<String> testVect = new BLM_Vector<String>();
     testVect.add("This");
     testVect.add("my");
     testVect.add("my");
@@ -123,6 +127,6 @@ public class BLM_Vector<T> {
   }
 
   public static void main(String[] args) {
-    new MyVector<Void>().driver();
+    new BLM_Vector<Void>().driver();
   }
 }

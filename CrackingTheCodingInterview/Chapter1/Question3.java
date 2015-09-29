@@ -1,7 +1,11 @@
-import java.util.*;
-import java.io.*;
+package CrackingTheCodingInterview.Chapter1;
 
-public class Three {
+import java.io.PrintStream;
+import java.util.Scanner;
+
+public class Question3 {
+
+  // TODO: Substitute main with junit tests
   public static void main(String[] args) {
     Scanner in = new Scanner(System.in);
     PrintStream out = System.out;
