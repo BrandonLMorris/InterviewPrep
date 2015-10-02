@@ -29,8 +29,14 @@ public class Question5Test {
 
     result = Question5.addListShortcut(first, second);
     System.out.println(toBackwardsString(first) + " + " + toBackwardsString(second) + " = " + toBackwardsString(result));
+
+    int firstInt = 99999;
+    result = Question5.addList(intToLinkedList(firstInt), intToLinkedList(firstInt));
+    System.out.println(toBackwardsString(intToLinkedList(firstInt)) + " + " + toBackwardsString(intToLinkedList(firstInt)) + " = " + toBackwardsString(result));
   }
 
+  // toBackwardsString(Node<T>) - converts a list into a string of its elements
+  // in reverse order.
   private static <T> String toBackwardsString(Node<T> head) {
     Node<T> current = head;
     String result = "";
@@ -39,5 +45,17 @@ public class Question5Test {
       current = current.next;
     }
     return result;
+  }
+
+  // intToLinkedList(int) - Converts an integer to a linked list
+  private static Node<Integer> intToLinkedList(int n) {
+    char[] arr = Integer.toString(n).toCharArray();
+    Node<Integer> head = new Node<Integer>(arr[0] - '0');
+    Node<Integer> current = head;
+    for (int i = 1; i < arr.length; i++) {
+      current.next = new Node<Integer>(arr[i] - '0');
+      current = current.next;
+    }
+    return head;
   }
 }
