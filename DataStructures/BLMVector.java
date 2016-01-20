@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 /**
  * A simple implementation of a dynamically-sized array,
- * also known as vector or ArrayList
+ * also known as vector or ArrayList.
  */
-public class BLM_Vector<T> {
+public class BLMVector<T> {
   private int size;
   private T[] elements;
 
 
   // Constructor with initial capacity
-  public BLM_Vector(int capacity) {
+  public BLMVector(int capacity) {
 
     // Minimal error checking, simply persists
     if (capacity <= 0) {
@@ -26,22 +26,21 @@ public class BLM_Vector<T> {
     @SuppressWarnings("unchecked")
     T[] arr = (T[])(new Object[capacity]);
     this.elements = arr;
-
   }
 
   // Constructor w/o initial capacity
-  public BLM_Vector() {
+  public BLMVector() {
     this(1);
   }
 
   /*
-   * Accessor method
-   * return the element at the particular index
-   * throws ArrayIndexOutOfBoundsException for bad indexes
-   * O(1) complexity
+   * Accessor method; returns the element at a particular index
+   * Complexity: O(1)
+   *
+   * @param index the index to retrieve
+   * @throws ArrayIndexOutOfBoundsException for bad indexes
    */
   public T get(int index) {
-    // Basic error checking
     if (index > size - 1 || index < 0) {
       throw new ArrayIndexOutOfBoundsException();
     } 
@@ -50,11 +49,12 @@ public class BLM_Vector<T> {
   }
 
   /*
-   * Removes an element at an index, and adjust the array O(n)
+   * Removes an element at an index, possibly resizing the underlying array.
    * Halves the array is less than 25% full
-   * return the element that was removed
-   * throws ArrayIndexOutOfBoundsExceiption for bad indexes
-   * O(n) complexity
+   * Complexity: O(n)
+   *
+   * @return the element that was removed
+   * @throws ArrayIndexOutOfBoundsExceiption for bad indexes
    */
   public T remove(int index) {
     if (index > size - 1 || index < 0) {
@@ -83,9 +83,11 @@ public class BLM_Vector<T> {
 
 
   /*
-   * Add an element to the end of the list.
-   * Has to copy the array over if underlying array is full.
-   * O(1) complexity, amortized
+   * Add an element to the end of the list. Doubles the size of the underlying
+   * array if full.
+   * Complexity: O(1) amortized
+   *
+   * @param toAdd the element to add to the vector
    */
   public void add(T toAdd) {
     // Resize the array if full
@@ -105,28 +107,4 @@ public class BLM_Vector<T> {
     return size;
   }
 
-
-  // A driver to test the class with
-  public void driver() {
-    BLM_Vector<String> testVect = new BLM_Vector<String>();
-    testVect.add("This");
-    testVect.add("my");
-    testVect.add("my");
-    testVect.add("vector");
-
-    for (int i = 0; i < testVect.size(); i++) {
-      System.out.println(testVect.get(i));
-    }
-
-    while (testVect.size() > 0) {
-      testVect.remove(0);
-    }
-
-    System.out.println("tesVect.size(): " + testVect.size());
-
-  }
-
-  public static void main(String[] args) {
-    new BLM_Vector<Void>().driver();
-  }
 }
