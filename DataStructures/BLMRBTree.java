@@ -1,14 +1,38 @@
+/**
+ * A basic implementation of a Red-Black Binary Search tree, using an array
+ * as the underlying data structure. The purpose is to mock functionality
+ * similar to Java's TreeSet class. As such, duplicates are not allowed.
+ *
+ * Created by Brandon Morris 2016
+ *
+ * The four rules of Red-Black trees are:
+ *  1) Each node is either red or black
+ *  2) The root and all empty trees are black
+ *  3) All paths from the root to an empty tree contain the same number of
+ *     black nodes
+ *  4) A red node cannot have a red child
+ */
 package DataStructures;
 
-import java.util.*;
-
-/**
- * A basic implementation of a binary search tree using an array
- */
 public class BLMRBTree<T extends Comparable<? super T>> {
+  public static final boolean RED = true;
+  public static final boolean BLACK = false;
+
   private T[] elements;
+  private int size;
   private Node root;
 
+  /** Basic constructor: creates a new tree */
+  public BLMRBTree() {
+    // TODO
+  }
+
+  /**
+   * Adds a new element to the Red Black tree. Automatically takes
+   * care of balancing the tree.
+   *
+   * @param toAdd the value to add to the tree
+   */
   public void add(T toAdd) {
     Node n = new Node(toAdd);
 
@@ -41,12 +65,12 @@ public class BLMRBTree<T extends Comparable<? super T>> {
 
     // Case 1: The new node is the root
     if (n == root) {
-      n.color = Node.BLACK;
+      n.color = BLACK;
       return;
     }
 
     // Case 2: The parent is red
-    if (n.parent.color == Node.BLACK) {
+    if (n.parent.color == BLACK) {
       return;
     }
 
@@ -55,15 +79,42 @@ public class BLMRBTree<T extends Comparable<? super T>> {
 
   }
 
+
+  public boolean contains(T value) { return false; }
+
+  public T first() { return null; }
+
+  public T last() { return null; }
+
+  public T ceiling(T element) { return null; }
+
+  public T floor(T element) { return null; }
+
+  public T higher(T element) { return null; }
+
+  public T lower(T element) { return null; }
+
+  public boolean remove(Object o) { return false; }
+
+  public T pollFirst() { return null; }
+
+  public T pollLast() { return null; }
+
+  public boolean isEmpty() {
+    return size == 0;
+  }
+
+  public int size() {return -1;}
+
   private void balance(Node n) {
     // Case 1
     if (n == this.root) {
-      n.color = Node.BLACK;
+      n.color = BLACK;
       return;
     }
 
     // Case 2
-    if (n.parent.color == Node.BLACK) {
+    if (n.parent.color == BLACK) {
       return;
     }
 
@@ -81,15 +132,15 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     }
 
     // Case 3
-    if (n.parent.color == Node.RED && uncle.color == Node.RED) {
-      n.parent.color = Node.BLACK;
-      n.parent.parent.color = Node.BLACK;
-      uncle.color = Node.RED;
+    if (n.parent.color == RED && uncle.color == RED) {
+      n.parent.color = BLACK;
+      n.parent.parent.color = BLACK;
+      uncle.color = RED;
       balance(n.parent.parent);
     }
 
     // Case 4
-    if (n.parent.color == Node.RED && uncle.color == Node.BLACK && nIsLeft != parentIsLeft) {
+    if (n.parent.color == RED && uncle.color == BLACK && nIsLeft != parentIsLeft) {
       
     }
   }
@@ -104,25 +155,20 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     return false;
   }
 
-
   /**
-   * The Node class.
-   * Contains the actual value, its color,
-   * and references to the parent and both
-   * children.
+   * The Node class. Contains the actual value, its color, and references to
+   * the parent and both children.
    */
   private class Node {
-    public static final int RED = 1;
-    public static final int BLACK = 0;
 
     public T value;
-    private int color;
+    private boolean color;
 
     public Node parent;
     public Node left;
     public Node right;
 
-    public int color() {
+    public boolean color() {
       return color;
     }
 
@@ -134,15 +180,6 @@ public class BLMRBTree<T extends Comparable<? super T>> {
 }
 
 /*
- *  *** 5 Rules of a RB Tree  ***
- * 1. Every node must be red or black
- * 2. The root node must be black
- * 3. Every leaf node (null) must be black
- * 4. No red node can be the child of a red node
- * 5. The number of black node along any path from 
- *    the root to a leaf must contain the same number
- *    or red nodes.
- *
  * Insertion
  * 1. Insert the node in its correct postion (in the BST)
  * 2. Paint it red
