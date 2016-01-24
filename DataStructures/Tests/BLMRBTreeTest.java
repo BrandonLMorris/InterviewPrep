@@ -216,12 +216,78 @@ public class BLMRBTreeTest {
     assertNull(empty.lower(Integer.MAX_VALUE));
   }
 
+  /*
   @Test
-  public void testRemove() { /* TODO */ }
+  public void testRemove() {
+    int prevSize = defaultSize;
+
+    // Try to remove an element not in the tree
+    assertFalse(intTree.remove(Integer.MAX_VALUE));
+    assertEquals(prevSize, intTree.size());
+
+    // Normal usage
+    for (int i = defaultSize - 1; i >= 0; i--) {
+      assertTrue(intTree.remove(i));
+      assertEquals(prevSize - 1, intTree.size());
+      prevSize = intTree.size();
+    }
+
+    prevSize = 10;
+    for (int i = 0; i < 10; i++) {
+      assertTrue(tenIntTree.remove(i));
+      assertEquals(prevSize - 1, tenIntTree.size());
+      prevSize = tenIntTree.size();
+    }
+
+    assertTrue(singleIntTree.remove(0));
+    assertEquals(0, singleIntTree.size());
+
+    // Removing from an empty tree
+    assertFalse(empty.remove(Integer.MIN_VALUE));
+  }
 
   @Test
-  public void testPollFirst() { /* TODO */ }
+  public void testPollFirst() {
+    int prevSize = defaultSize;
+
+    // Normal usage
+    for (int i = 0; i < defaultSize; i++) {
+      assertEquals((Integer)i, intTree.pollFirst());
+      assertEquals(prevSize - 1, intTree.size());
+      prevSize = intTree.size();
+    }
+
+    prevSize = 10;
+    for (int i = 0; i < 10; i++) {
+      assertEquals((Integer)i, tenIntTree.pollFirst());
+      assertEquals(prevSize - 1, tenIntTree.size());
+      prevSize = tenIntTree.size();
+    }
+
+    assertEquals((Integer)0, singleIntTree.pollFirst());
+    assertEquals(0, singleIntTree.size());
+  }
 
   @Test
-  public void testPollLast() { /* TODO */ }
+  public void testPollLast() {
+    int prevSize = defaultSize;
+
+    // Normal usage
+    for (int i = defaultSize - 1; i > 0; i--) {
+      assertEquals((Integer) i, intTree.pollLast());
+      assertEquals(prevSize - 1, intTree.size());
+      prevSize = intTree.size();
+    }
+
+    prevSize = 10;
+    for (int i = 0; i < 10; i++) {
+      assertEquals((Integer) i, tenIntTree.pollLast());
+      assertEquals(prevSize - 1, tenIntTree.size());
+      prevSize = tenIntTree.size();
+    }
+
+    assertEquals((Integer) 0, singleIntTree.pollLast());
+    assertEquals(0, singleIntTree.size());
+  }
+  */
 }

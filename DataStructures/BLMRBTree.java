@@ -100,6 +100,15 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @throws java.util.NoSuchElementException if the tree is empty
    */
   public T first() {
+    return firstNode().value;
+  }
+
+  /**
+   * Returns the lowest (least) Node in this tree.
+   *
+   * @throws java.util.NoSuchElementException if the tree is empty
+   */
+  private Node firstNode() {
     if (isEmpty()) {
       throw new NoSuchElementException("No first in empty tree");
     }
@@ -110,7 +119,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
       current = current.left;
     }
 
-    return current.value;
+    return current;
   }
 
   /**
@@ -119,6 +128,15 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @throws java.util.NoSuchElementException if the tree is empty
    */
   public T last() {
+    return lastNode().value;
+  }
+
+  /**
+   * Returns the highest (greatest) element in this tree
+   *
+   * @throws java.util.NoSuchElementException if the tree is empty
+   */
+  private Node lastNode() {
     if (isEmpty()) {
       throw new NoSuchElementException("No last in empty tree");
     }
@@ -129,7 +147,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
       current = current.right;
     }
 
-    return current.value;
+    return current;
   }
 
   /**
@@ -141,41 +159,8 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    *         in the set is less than the given element
    */
   public T ceiling(T element) {
-    Node current = root;
-
-    if (!isEmpty() && last().compareTo(element) < 0) {
-      return null;
-    }
-
-    while (current != null) {
-      int comp = current.value.compareTo(element);
-
-      if (comp == 0) {
-        return current.value;
-      }
-
-      if (comp < 0) {                 // current is less than element
-        if (current.right != null) {
-          current = current.right;
-        } else {
-          // Move up until find a parent that this is the right child of
-          while (current.parent != null) {
-            if (current.parent.left == current) {
-              return current.parent.value;
-            }
-            current = current.parent;
-          }
-          return null;
-        }
-      } else {                       // current is greater than element
-        if (current.left == null) {
-          return current.value;
-        }
-        current = current.left;
-      }
-    }
-
-    return null;
+    Node ceil = successor(element, true);
+    return ceil == null ? null : ceil.value;
   }
 
   /**
@@ -185,38 +170,8 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @param element the element to find the floor off of
    */
   public T floor(T element) {
-    Node current = root;
-
-    if (isEmpty() || first().compareTo(element) > 0) {
-      return null;
-    }
-
-    while (current != null) {
-      int comp = current.value.compareTo(element);
-
-      if (comp == 0) {
-        return current.value;
-      }
-
-      if (comp > 0) {           // current is greater than element
-        if (current.left == null) {
-          return current.value;
-        }
-        current = current.left;
-      } else {                 // current is less than element
-        if (current.right != null) {
-          current = current.right;
-        } else {
-          // Move up until encounter a parent that this is the left child of
-          while (current.parent != null && current.parent.left == current) {
-            current = current.parent;
-          }
-          return current.value.compareTo(element) <= 0 ? current.value : null;
-        }
-      }
-    }
-
-    return null;
+    Node floor = predecessor(element, true);
+    return floor == null ? null : floor.value;
   }
 
   /**
@@ -228,36 +183,8 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @throws java.util.NoSuchElementException if the tree is empty
    */
   public T higher(T element) {
-    Node current = root;
-
-    if (isEmpty() || last().compareTo(element) <= 0) {
-      return null;
-    }
-
-    while (current != null) {
-      int comp = current.value.compareTo(element);
-
-      if (comp <= 0) {           // current is less than or equal to the element
-        if (current.right != null) {
-          current = current.right;
-        } else {
-          // Move up until find a parent that this is the right child of
-          while (current.parent != null) {
-            if (current.parent.left == current) {
-              return current.parent.value;
-            }
-            current = current.parent;
-          }
-          return null;
-        }
-      } else {                  // current is greater than the element
-        if (current.left == null) {
-          return current.value;
-        }
-        current = current.left;
-      }
-    }
-    return null;
+    Node higher = successor(element, false);
+    return higher == null ? null : higher.value;
   }
 
   /**
@@ -269,36 +196,8 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @throws java.util.NoSuchElementException if tree is emtpy
    */
   public T lower(T element) {
-    Node current = root;
-
-    if (isEmpty() || first().compareTo(element) >= 0) {
-      return null;
-    }
-
-    while (current != null) {
-      int comp = current.value.compareTo(element);
-
-      if (comp >= 0) {  // current is greater than or equal to the element
-        if (current.left != null) {
-          current = current.left;
-        } else {
-          // Find the first parent that this is a right child of
-          while (current.parent != null) {
-            if (current.parent.right == current) {
-              return current.parent.value;
-            }
-            current = current.parent;
-          }
-          return null;
-        }
-      } else {  // current is less than the element
-        if (current.right == null) {
-          return current.value;
-        }
-        current = current.right;
-      }
-    }
-    return null;
+    Node lower = predecessor(element, false);
+    return lower == null ? null : lower.value;
   }
 
   /**
@@ -319,8 +218,10 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @return the element removed
    */
   public T pollFirst() {
-    // TODO
-    return null;
+    if (isEmpty()) {
+      return null;
+    }
+    return delete(firstNode()).value;
   }
 
   /**
@@ -328,8 +229,10 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @return the element removed
    */
   public T pollLast() {
-    // TODO
-    return null;
+    if (isEmpty()) {
+      return null;
+    }
+    return delete(lastNode()).value;
   }
 
   /** Return a list of all the elements in this Tree in ascending order. */
@@ -388,6 +291,17 @@ public class BLMRBTree<T extends Comparable<? super T>> {
       }
       current = current.right;
     }
+  }
+
+  /**
+   * Delete and return the given Node from the tree and rebalance as necessary
+   *
+   * @param node the node to delete
+   * @return the node removed from the tree
+   */
+  private Node delete(Node node) {
+    // TODO
+    return null;
   }
 
   /**
@@ -549,6 +463,88 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     if (root == a) {
       root = b;
     }
+  }
+
+  /**
+   * Find the in-order successor to a given value in the tree.
+   * @param element  the value to find the successor of
+   * @param canEqual  whether the successor can equal the given value
+   * @return  the next value of greater (or equal) value, or null if no such
+   *          element exists in the tree.
+   */
+  private Node successor(T element, boolean canEqual) {
+    Node current = root;
+
+    if (!isEmpty() && last().compareTo(element) < 0) {
+      return null;
+    }
+
+    while (current != null) {
+      int comp = current.value.compareTo(element);
+
+      if (comp == 0 && canEqual) {
+        return current;
+      }
+
+      if (comp < 0 || (comp == 0 && !canEqual)) {
+        if (current.right != null) {
+          current = current.right;
+        } else {
+          // Move up until find a parent that this is the right child of
+          while (current.parent != null) {
+            if (current.parent.left == current) {
+              return current.parent;
+            }
+            current = current.parent;
+          }
+          return null;
+        }
+      } else {                       // current is greater than element
+        if (current.left == null) {
+          return current;
+        }
+        current = current.left;
+      }
+    }
+
+    return null;
+  }
+
+  private Node predecessor(T element, boolean canEqual) {
+    Node current = root;
+
+    if (isEmpty() || first().compareTo(element) > 0) {
+      return null;
+    }
+
+    while (current != null) {
+      int comp = current.value.compareTo(element);
+
+      if (comp == 0 && canEqual) {
+        return current;
+      }
+
+      if (comp > 0 || (comp == 0 && !canEqual)) {
+        if (current.left != null) {
+          current = current.left;
+        } else {
+          // Find the first parent that this is a right child of
+          while (current.parent != null) {
+            if (current.parent.right == current) {
+              return current.parent;
+            }
+            current = current.parent;
+          }
+          return null;
+        }
+      } else {  // current is less than the element
+        if (current.right == null) {
+          return current;
+        }
+        current = current.right;
+      }
+    }
+    return null;
   }
 
   /**
