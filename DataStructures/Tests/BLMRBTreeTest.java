@@ -23,6 +23,7 @@ public class BLMRBTreeTest {
     intTree = new BLMRBTree<Integer>();
     for (int i = 0; i < defaultSize; i++) {
       intTree.add(i);
+      assertFalse(intTree.hasRedRedPair());
     }
 
     // Tree with one element
@@ -33,6 +34,7 @@ public class BLMRBTreeTest {
     tenIntTree = new BLMRBTree<Integer>();
     for (int i = 0; i < 10; i++) {
       tenIntTree.add(i);
+      assertFalse(tenIntTree.hasRedRedPair());
     }
 
     // Empty tree
@@ -42,6 +44,7 @@ public class BLMRBTreeTest {
     evens = new BLMRBTree<Integer>();
     for (int i = 0; i < 50; i++) {
       evens.add(i*2);
+      assertFalse(evens.hasRedRedPair());
     }
   }
 
@@ -216,7 +219,12 @@ public class BLMRBTreeTest {
     assertNull(empty.lower(Integer.MAX_VALUE));
   }
 
-  /*
+  @Test
+  public void noRedPairs() {
+    assertFalse(intTree.hasRedRedPair());
+    assertFalse(tenIntTree.hasRedRedPair());
+  }
+
   @Test
   public void testRemove() {
     int prevSize = defaultSize;
@@ -230,13 +238,15 @@ public class BLMRBTreeTest {
       assertTrue(intTree.remove(i));
       assertEquals(prevSize - 1, intTree.size());
       prevSize = intTree.size();
+      assertFalse(tenIntTree.hasRedRedPair());
     }
 
     prevSize = 10;
     for (int i = 0; i < 10; i++) {
-      assertTrue(tenIntTree.remove(i));
+      assertTrue("Removing " + i + " from tenIntTree", tenIntTree.remove(i));
       assertEquals(prevSize - 1, tenIntTree.size());
       prevSize = tenIntTree.size();
+      assertFalse(tenIntTree.hasRedRedPair());
     }
 
     assertTrue(singleIntTree.remove(0));
@@ -255,6 +265,7 @@ public class BLMRBTreeTest {
       assertEquals((Integer)i, intTree.pollFirst());
       assertEquals(prevSize - 1, intTree.size());
       prevSize = intTree.size();
+      assertFalse(intTree.hasRedRedPair());
     }
 
     prevSize = 10;
@@ -262,6 +273,7 @@ public class BLMRBTreeTest {
       assertEquals((Integer)i, tenIntTree.pollFirst());
       assertEquals(prevSize - 1, tenIntTree.size());
       prevSize = tenIntTree.size();
+      assertFalse(tenIntTree.hasRedRedPair());
     }
 
     assertEquals((Integer)0, singleIntTree.pollFirst());
@@ -280,8 +292,8 @@ public class BLMRBTreeTest {
     }
 
     prevSize = 10;
-    for (int i = 0; i < 10; i++) {
-      assertEquals((Integer) i, tenIntTree.pollLast());
+    for (int i = 9; i >= 0; i--) {
+      assertEquals((Integer)i, tenIntTree.pollLast());
       assertEquals(prevSize - 1, tenIntTree.size());
       prevSize = tenIntTree.size();
     }
@@ -289,5 +301,4 @@ public class BLMRBTreeTest {
     assertEquals((Integer) 0, singleIntTree.pollLast());
     assertEquals(0, singleIntTree.size());
   }
-  */
 }

@@ -49,7 +49,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     Node node = new Node(toAdd);
     insert(node);
     size++;
-    balance(node);
+    balanceUp(node);
 
     return true;
   }
@@ -61,13 +61,26 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    *
    * @param o value to search for
    * @return  true if in the Tree, false otherwise.
-   * @throws java.util.NoSuchElementException if the tree is empty
-   * @throws java.lang.ClassCastException if the parameter cannot be comparable
+   * @throws java.lang.ClassCastException if the argument cannot be comparable
    *                                      with the tree type
    */
   public boolean contains(Object o) {
+    return find(o) != null;
+  }
+
+  /**
+   * Find a node in the tree based on a given value
+   *
+   * @param o the value to search off of
+   * @throws java.util.NoSuchElementException if the tree is empty
+   * @throws java.lang.ClassCastException if the argument is not comparable
+   *                                      with the tree type
+   * @return  the Node whose value is equal to the argument, or null if no
+   *          such element exists
+   */
+  private Node find(Object o) {
     if (isEmpty()) {
-      return false;
+      return null;
     }
 
     // Attempt to cast to perform binary search
@@ -75,15 +88,15 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     if (o instanceof Comparable) {
       c = (Comparable)o;
     } else {
-      // Resort to linear search
-      return toList().contains(o);
+      // Can't locate unless comparable
+      return null;
     }
 
     Node current = root;
     while (current != null) {
       int comp = c.compareTo(current.value);
       if (comp == 0) {
-        return true;
+        return current;
       } else if (comp < 0) {
         current = current.left;
       } else {
@@ -91,7 +104,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
       }
     }
 
-    return false;
+    return null;
   }
 
   /**
@@ -208,8 +221,183 @@ public class BLMRBTree<T extends Comparable<? super T>> {
    * @return    true if the object was found in the tree
    */
   public boolean remove(Object o) {
-    // TODO
-    return false;
+    Node node = find(o), parent = null;
+    if (node == null) {
+      return false;
+    }
+
+    // When removing the last element from the tree
+    boolean isRoot = node == root;
+    if (isRoot && size == 1) {
+      root = null;
+      size--;
+      return true;
+    }
+
+    boolean isLeftChild = false;
+    boolean needBalance = true;
+    if (!isRoot) {
+      isLeftChild = node.parent.left == node;
+    }
+
+    // Case 1: node is a leaf. Remove and return
+    if (node.left == null && node.right == null) {
+      // Disconnect from the parent
+      if (!isRoot && isLeftChild) {
+        node.parent.left = null;
+      } else if (!isRoot) {
+        node.parent.right = null;
+      }
+      parent = node.parent;
+      needBalance = node.black();
+      node.parent = null;
+      if (needBalance) {
+        deleteBalance(null, parent);
+      }
+      size--;
+      return true;
+    }
+
+    // Case 2: node only has one child. Copy into this position
+    if (node.right != null && node.left == null) {
+      // Move the right child
+      node.right.parent = node.parent;
+      if (!isRoot) {
+        if (isLeftChild) {
+          node.parent.left = node.right;
+        } else {
+          node.parent.right = node.right;
+        }
+        if ((node.right != null && node.right.red()) || node.red()) {
+          needBalance = false;
+        }
+        if (needBalance) {
+          deleteBalance(node.right, node.parent);
+        } else {
+          node.right.color = BLACK;
+        }
+      } else {
+        root = node.right;
+        root.color = BLACK;
+      }
+      node.right = null;
+      size--;
+      return true;
+    } else if (node.left != null && node.right == null) {
+      // Move the left child
+      node.left.parent = node.parent;
+      if (!isRoot) {
+        if (isLeftChild) {
+          node.parent.left = node.left;
+        } else {
+          node.parent.right = node.left;
+        }
+        if ((node.left != null && node.left.red()) || node.red()) {
+          needBalance = false;
+        }
+        if (needBalance) {
+          deleteBalance(node.left, node.parent);
+        } else {
+          node.left.color = BLACK;
+        }
+      } else {
+        root = node.left;
+        root.color = BLACK;
+      }
+      node.left = null;
+      size--;
+      return true;
+    }
+
+    // Case 3: node has two children. Swap with the in-order successor then
+    // recur on that node
+    Node replacement = successor(node.value, false);
+    T newVal = replacement.value;
+    remove(replacement.value);
+    node.value = newVal;
+    return true;
+  }
+
+  /**
+   * Rebalance a tree at a particular Node after a deletion operation given
+   * the Node that replaces the deleted one and its parent (in case the
+   * replacement is null).
+   *
+   * @param u the node that replaces the deleted one
+   * @param p the parent of the replacement node
+   */
+  private void deleteBalance(Node u, Node p) {
+    if (u == root) {
+      u.color = BLACK;
+      return;
+    }
+
+    boolean sIsLeft = p.left != u;
+    Node s = sIsLeft ? p.left : p.right;
+
+    if (s == null) {
+      if (p.black()) {
+        deleteBalance(p, p.parent);
+      } else {
+        p.color = RED;
+        return;
+      }
+    }
+
+    // Case when s is red: recolor, rotate, then recur
+    if (s.red()) {
+      s.color = !s.color;
+      p.color = !p.color;
+      if (sIsLeft) {
+        rotateRight(p);
+      } else {
+        rotateLeft(p);
+      }
+      deleteBalance(u, p);
+      return;
+    }
+
+    boolean sLeftRed = false, sRightRed = false;
+    if (s.left != null && s.left.red()) {
+      sLeftRed = true;
+    }
+    if (s.right != null && s.right.red()) {
+      sRightRed = true;
+    }
+
+    // First case: s has a red child
+    if (sLeftRed || sRightRed) {
+      if (sIsLeft) {
+        if (sLeftRed) {
+          // Left left
+          rotateRight(p);
+          s.left.color = !s.left.color;
+        } else {
+          // Left right
+          rotateLeft(s);
+          rotateRight(p);
+          p.parent.color = !p.parent.color;
+        }
+      } else if (sRightRed) {
+        // Right right
+        rotateLeft(p);
+        s.right.color = !s.right.color;
+      } else {
+        // Right left
+        rotateRight(s);
+        rotateLeft(p);
+        p.parent.color = !p.parent.color;
+      }
+      return;
+    }
+
+    // Case when s is black an has no red children
+    s.color = !s.color;
+    if (p.black()) {
+      deleteBalance(p, p.parent);
+    } else {
+      p.color = BLACK;
+    }
   }
 
   /**
@@ -221,7 +409,9 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     if (isEmpty()) {
       return null;
     }
-    return delete(firstNode()).value;
+    T first = first();
+    remove(first);
+    return first;
   }
 
   /**
@@ -232,15 +422,14 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     if (isEmpty()) {
       return null;
     }
-    return delete(lastNode()).value;
+    T last = last();
+    remove(last);
+    return last;
   }
 
   /** Return a list of all the elements in this Tree in ascending order. */
   public List<T> toList() {
-    Node current = root;
-    ArrayList<T> result = new ArrayList<T>(size);
-
-    return inOrder(root, result);
+    return inOrder(root, new ArrayList<T>(size));
   }
 
   /** Determine if the tree contains any elements */
@@ -294,23 +483,12 @@ public class BLMRBTree<T extends Comparable<? super T>> {
   }
 
   /**
-   * Delete and return the given Node from the tree and rebalance as necessary
-   *
-   * @param node the node to delete
-   * @return the node removed from the tree
-   */
-  private Node delete(Node node) {
-    // TODO
-    return null;
-  }
-
-  /**
    * Helper method to balance the tree. Calls itself recursively moving
    * up the tree until at the root.
    *
    * @param node the Node to balance off of
    */
-  private void balance(Node node) {
+  private void balanceUp(Node node) {
     // Root must always be black (Rule #2)
     if (node == root) {
       root.color = BLACK;
@@ -320,7 +498,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     // If child of the root or not a red-red pair, call recursively on
     // the parent
     if (node.parent == root || !(node.red() && node.parent.red())) {
-      balance(node.parent);
+      balanceUp(node.parent);
       return;
     }
 
@@ -335,7 +513,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
       parent.color = !parent.color;
       grandparent.color = !grandparent.color;
       ankle.color = !ankle .color;
-      balance(parent);
+      balanceUp(parent);
       return;
     }
 
@@ -356,7 +534,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
         rotateLeft(grandparent);
       }
 
-      balance(parent);
+      balanceUp(parent);
       return;
     }
 
@@ -371,7 +549,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
 
     // Rebalance on the parent since it's now the lowest member of the
     // neighborhood
-    balance(parent);
+    balanceUp(parent);
   }
 
   /**
@@ -467,6 +645,7 @@ public class BLMRBTree<T extends Comparable<? super T>> {
 
   /**
    * Find the in-order successor to a given value in the tree.
+   *
    * @param element  the value to find the successor of
    * @param canEqual  whether the successor can equal the given value
    * @return  the next value of greater (or equal) value, or null if no such
@@ -510,6 +689,14 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     return null;
   }
 
+  /**
+   * Find the in-order predecessor to a given value in the tree.
+   *
+   * @param element the value to find the predecessor of
+   * @param canEqual whether the predecessor can equal the element
+   * @return the largest value of lesser (or equal) value to element, or null if
+   *         no such element exists in the tree.
+   */
   private Node predecessor(T element, boolean canEqual) {
     Node current = root;
 
@@ -568,7 +755,35 @@ public class BLMRBTree<T extends Comparable<? super T>> {
     return list;
   }
 
-  /** Return a string representation of this traversal */
+  /**
+   * Determines if any red node has a red sibling in the tree. Used to ensure
+   * balance and adherence to the rules of a Red Black tree.
+   *
+   * @return true if a red-red pair is found, false otherwise
+   */
+  public boolean hasRedRedPair() {
+    // Do an in-order traversal, looking for red-red pairs
+    return root != null && hasRedRedPair(root);
+  }
+
+  /**
+   * Determines if any red node has a red sibling, starting from the given node
+   *
+   * @param n the node to search off of
+   * @return true if the tree rooted at n contains a red-red pair
+   */
+  private boolean hasRedRedPair(Node n) {
+    if (n.black()) {
+      // This node is black, so it can't be part of a red-red pair
+      return (n.left != null && hasRedRedPair(n.left))
+          || (n.right != null && hasRedRedPair(n.right));
+    }
+    // This node is red
+    return (n.left != null && n.left.red())
+        || (n.right != null && n.right.red());
+  }
+
+  /** Return a string representation of an in-order traversal */
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("[");
@@ -689,4 +904,49 @@ public class BLMRBTree<T extends Comparable<? super T>> {
  *     A(b)   P(r)        | Grandparent.
  *              \         |
  *              N(r)      |
+ */
+
+/*
+ * Deletion Algorithm details
+ * Taken from GeeksForGeeks.org
+ * www.geeksforgeeks.org/red-black-tree-set-3-delete-2/
+ *
+ * Unlike insertion, deletion can break the structural integrity of the tree
+ * mainly by removing a black node, thus breaking rule #3. When a black node
+ * gets replaced by another black, it is considered a "double black" and must
+ * be dealt with.
+ *
+ * 1. Perform standard BST delete. Since the BST delete function recurs when
+ * the deleted node has two children, the only case needs to be considered is
+ * when a node has zero or one children, since that is the node that is actually
+ * removed from the tree. v is the node that is being deleted, and u is the
+ * child that is replacing v.
+ *
+ * 2. Case when either u or v is red. This case does not damage the structure
+ * of the tree. Simply ensure that the replacement node is black.
+ *
+ * 3. Case when both u and v are black
+ *    3.1 u is now a double black (even occurs when v is a leaf, since empty
+ *    trees are considered black).
+ *    3.2 While u is double black or not the root:
+ *      a) If u's sibling (the other child of the parent) s is black and has at
+ *      least one red child, perform rotations.
+ *        i) Left left: s is a left child and the left child of s is red (or
+ *        both children). Rotate right about the parent
+ *        ii) Left right: s is a left child and only the right child of s is
+ *        red. Rotate left about s, then right about p.
+ *        iii) Right right: s is a right child and the right child of s is red
+ *        (or both children). This is a mirror of (i). Rotate left about parent
+ *        iv) Right left: s is a right child and only the left child of s is
+ *        red. This is a mirror of (ii). Rotate left about s, then right about
+ *        p.
+ *
+ *      b) u's sibling (s) is black and has two black (or null) children.
+ *      Recolor the sibling to be red, then recursively call the balance on the
+ *      parent. (If the parent is red, just recolor, don't call again).
+ *
+ *      c) If u's sibling (s) is red, recolor the sibling and the parent, then
+ *      rotate such that the sibling is now in the parent's position (right
+ *      rotation if s is a left child, left rotation is s is a right child).
+ *      Now it is a case of (a) or (b).
  */
