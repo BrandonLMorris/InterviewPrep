@@ -6,10 +6,12 @@
 package DataStructures;
 
 
-public class BLMLinkedList<T> {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class BLMLinkedList<T> implements Iterable<T> {
   private int size;
   private Node head, tail;
-
 
   /** Basic constructor: creates an empty list */
   public BLMLinkedList() {
@@ -28,7 +30,6 @@ public class BLMLinkedList<T> {
     }
   }
 
-
   /** Create a Linked List from an array */
   public BLMLinkedList(T[] arr) {
     this.size = 0;
@@ -39,7 +40,6 @@ public class BLMLinkedList<T> {
     }
   }
 
-
   /**
    * Add an element to the list at an index
    *
@@ -47,7 +47,7 @@ public class BLMLinkedList<T> {
    * @param index where to add the element
    * @throws java.lang.IndexOutOfBoundsException if the index is out of range
    */
-  public boolean add(T toAdd, int index) {
+  public boolean add(int index, T toAdd) {
     // Handle the out of bounds case
     if (index < 0 || index > size) {
       throw new IndexOutOfBoundsException();
@@ -82,7 +82,6 @@ public class BLMLinkedList<T> {
     return true;
   }
 
-
   /**
    * Add an element to the front of the list
    *
@@ -100,7 +99,6 @@ public class BLMLinkedList<T> {
     return true;
   }
 
-
   /** Delete and return the first element in the list */
   public T pop() {
     if (size == 0) {
@@ -111,7 +109,6 @@ public class BLMLinkedList<T> {
     size--;
     return n.data;
   }
-
 
   /**
    *  Add an element to the end of the list
@@ -130,7 +127,6 @@ public class BLMLinkedList<T> {
     return true;
   }
 
-
   /**
    * Determine if list contains an element. Relies on the equals() method to
    * determine equality.
@@ -138,20 +134,25 @@ public class BLMLinkedList<T> {
    * @param elem the element to search for
    */
   public boolean contains(T elem) {
+    return indexOf(elem) != -1;
+  }
+
+  /** Returns the index of a value in the list or -1 if not present */
+  public int indexOf(T elem) {
     Node current = head;
+    int pos = 0;
 
     // Iterate over the list
     while (current != null) {
       if (current.data.equals(elem)) {
-        return true;
+        return pos;
       }
       current = current.next;
+      pos++;
     }
 
-    // Couldn't find the element
-    return false;
+    return -1;
   }
-
 
   /**
    * Retrieve an element from a particular index
@@ -186,7 +187,6 @@ public class BLMLinkedList<T> {
     return current.data;
   }
 
-
   /**
    * Update an index to a particular value
    *
@@ -194,7 +194,7 @@ public class BLMLinkedList<T> {
    * @param index the index to change
    * @throws java.lang.IndexOutOfBoundsException if index is out of range
    */
-  public boolean update(T value, int index) {
+  public boolean set(int index, T value) {
     // Handle the out of bounds error
     if (index < 0 || index >= size) {
       throw new IndexOutOfBoundsException();
@@ -221,7 +221,6 @@ public class BLMLinkedList<T> {
     return true;
   }
 
-
   /** Delete and return the last element in the list */
   public T removeLast() {
     if (head == null) {
@@ -244,7 +243,6 @@ public class BLMLinkedList<T> {
     return removed.data;
   }
 
-
   /**
    * Delete and return the element at a particular index
    *
@@ -253,7 +251,7 @@ public class BLMLinkedList<T> {
    * @throws java.lang.IndexOutOfBoundsException if the element is out of range
    * @throws java.lang.IllegalStateException if list is empty
    */
-  public T delete(int index) {
+  public T remove(int index) {
     // Handle the out of bounds case
     if (index < 0 || index >= size) {
       throw new IndexOutOfBoundsException();
@@ -290,6 +288,19 @@ public class BLMLinkedList<T> {
     return current.data;
   }
 
+  public T remove(T value) {
+    int index = indexOf(value);
+    if (index != -1) {
+      remove(index);
+      return value;
+    }
+    return null;
+  }
+
+  /** Return true if the list contains no elements */
+  public boolean isEmpty() {
+    return size == 0;
+  }
 
   /** Display the contents of the linked list in string form */
   @Override
@@ -314,12 +325,10 @@ public class BLMLinkedList<T> {
     return sb.toString();
   }
 
-
   /** Return the size of the Linked List */
   public int size() {
     return this.size;
   }
-
 
   /** Return the head of the Linked List */
   public T head() {
@@ -329,7 +338,6 @@ public class BLMLinkedList<T> {
     return this.head.data;
   }
 
-
   /** Return the tail of the Linked List */
   public T tail() {
     if (size == 0) {
@@ -338,6 +346,31 @@ public class BLMLinkedList<T> {
     return this.tail.data;
   }
 
+  // TODO: Implement an interator
+  public Iterator<T> iterator() {
+    return new Iterator<T>() {
+      Node current = head;
+
+      public void remove() {
+        throw new UnsupportedOperationException(
+            "BLMLinkedList iterator does not support remove()");
+      }
+
+      public boolean hasNext() {
+        return current != null;
+      }
+
+      public T next() {
+        if (!hasNext()) {
+          throw new NoSuchElementException();
+        }
+
+        T returnValue = current.data;
+        current = current.next;
+        return returnValue;
+      }
+    };
+  }
 
   /** Nested class to store the linked list nodes */
   private class Node {

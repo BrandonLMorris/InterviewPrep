@@ -32,7 +32,7 @@ public class BLMLinkedListTest {
     }
     assertEquals(howMany, intList.size());
 
-    intList.add(-1, 0);
+    intList.add(0, -1);
     assertEquals(-1, (int)intList.get(0));
   }
 
@@ -49,7 +49,7 @@ public class BLMLinkedListTest {
     int prev = intList.get(index-1);
     int after = intList.get(index);
 
-    intList.add(-99, index);
+    intList.add(index, -99);
 
     assertEquals(-99, (int) intList.get(index));
     assertEquals(prev, (int)intList.get(index-1));
@@ -64,20 +64,20 @@ public class BLMLinkedListTest {
 
   @Test
   public void testContains() {
-    assertTrue(intList.contains(defaultSize-1));
-    assertTrue(intList.contains(defaultSize/2));
-    assertFalse(intList.contains(defaultSize+10));
+    assertTrue(intList.contains(defaultSize - 1));
+    assertTrue(intList.contains(defaultSize / 2));
+    assertFalse(intList.contains(defaultSize + 10));
   }
 
   @Test
-  public void testUpdate() {
-    intList.update(Integer.MIN_VALUE, defaultSize / 2);
+  public void testSet() {
+    intList.set(defaultSize / 2, Integer.MIN_VALUE);
     assertEquals(Integer.MIN_VALUE, (int)intList.get(defaultSize / 2));
 
-    intList.update(Integer.MAX_VALUE, 0);
+    intList.set(0, Integer.MAX_VALUE);
     assertEquals(Integer.MAX_VALUE, (int)intList.get(0));
 
-    intList.update(Integer.MIN_VALUE, defaultSize-1);
+    intList.set(defaultSize - 1, Integer.MIN_VALUE);
     assertEquals(Integer.MIN_VALUE, (int)intList.get(defaultSize-1));
   }
 
@@ -110,16 +110,16 @@ public class BLMLinkedListTest {
   }
 
   @Test
-  public void testDelete() {
+  public void testRemove() {
     // Normal use
     int index = defaultSize / 2;
     int before = (int)intList.get(index+1);
-    assertEquals(intList.get(index), intList.delete(index));
+    assertEquals(intList.get(index), intList.remove(index));
     assertEquals(before, (int)intList.get(index));
     assertEquals(defaultSize-1, intList.size());
 
     // Case with one element
-    assertEquals(0, (int)singleIntList.delete(0));
+    assertEquals(0, (int)singleIntList.remove(0));
     assertEquals(0, singleIntList.size());
     assertNull(singleIntList.head());
     assertNull(singleIntList.tail());
