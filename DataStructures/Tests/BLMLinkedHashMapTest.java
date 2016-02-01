@@ -4,6 +4,10 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import DataStructures.BLMLinkedHashMap;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Unit tests for all the public methods in the BLMLinkedHashMap class.
  *
@@ -87,7 +91,10 @@ public class BLMLinkedHashMapTest {
 
   @Test
   public void testEntrySet() {
-    // TODO
+    // TODO test entrySet() more thoroughly
+    Set<Map.Entry<String, Integer>> stringSet = stringToInt.entrySet();
+    assertNotNull(stringSet);
+    assertEquals(11, stringSet.size());
   }
 
   @Test
@@ -103,7 +110,8 @@ public class BLMLinkedHashMapTest {
     BLMLinkedHashMap<Integer, Integer> second =
         new BLMLinkedHashMap<Integer, Integer>();
     assertFalse(first.equals(second));
-    assertFalse(second.equals(first));
+    boolean result = second.equals(first);
+    assertFalse(result);
 
     second.put(1, -1);
     assertFalse(first.equals(second));
@@ -177,17 +185,61 @@ public class BLMLinkedHashMapTest {
 
   @Test
   public void testPutAll() {
-    // TODO
+    // Relies on size() and get() to work correctly
+
+    HashMap<Integer, Integer> hm = new HashMap<Integer, Integer>();
+    hm.put(1, -1); hm.put(2, -2); hm.put(3, -3);
+
+    BLMLinkedHashMap<Integer, Integer> map =
+        new BLMLinkedHashMap<Integer, Integer>();
+
+    map.putAll(hm);
+
+    assertEquals(3, map.size());
+    assertEquals((Integer)(-1), map.get(1));
+    assertEquals((Integer)(-2), map.get(2));
+    assertEquals((Integer)(-3), map.get(3));
   }
 
   @Test
   public void testRemove() {
-    // TODO
+    // Relies on get() and containsKey() to pass
+
+    // Attempt to remove keys not in the map
+    assertNull(stringToInt.remove("forty-two"));
+    assertNull(stringToInt.remove("eleventy-first"));
+
+    // Emtpy the map one element at a time
+    int prevSize = stringToInt.size();
+    for (Integer i = 0; i <= 10; i++) {
+      String s = zeroToTen[i];
+      assertEquals(i, stringToInt.remove(s));
+      System.out.println(stringToInt.get(s)); // DEBUG
+      assertFalse(stringToInt.containsKey(s));
+      assertNull(stringToInt.get(s));
+      assertEquals(--prevSize, stringToInt.size());
+    }
+    assertTrue(stringToInt.isEmpty());
+
+    prevSize = basicMap.size();
+    for (Integer i = TEST_SIZE - 1; i >= 0; i--) {
+      assertEquals(i, basicMap.remove(i));
+      assertFalse(basicMap.containsKey(i));
+      assertNull(basicMap.get(i));
+      assertEquals(--prevSize, basicMap.size());
+    }
+    assertTrue(basicMap.isEmpty());
+
+
+    // Remove from an empty map
+    assertNull(empty.remove(new Object()));
   }
 
   @Test
   public void testSize() {
-    // TODO
+    assertEquals(11, stringToInt.size());
+    assertEquals(TEST_SIZE, basicMap.size());
+    assertEquals(0, empty.size());
   }
 
   @Test

@@ -1,5 +1,6 @@
 package DataStructures;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.HashSet;
 import java.util.AbstractMap;
 import java.util.Map;
@@ -46,9 +47,15 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
    * this method is complete.
    */
   public void clear() {
-    for (K key : keySet()) {
-      remove(key);
-    }
+//    for (K key : keySet()) {
+//      remove(key);
+//    }
+    // Reset all the values of this map
+    entries = new Object[DEFAULT_CAPACITY];
+    keySet = new HashSet<K>();
+    load = 0;
+    size = 0;
+    capacity = DEFAULT_CAPACITY;
   }
 
   /**
@@ -137,7 +144,32 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
    */
   @SuppressWarnings("unchecked")
   public V put(K key, V value) {
-    // TODO: Resize when overloaded
+    // Resize if overloaded
+    if (load / (double)capacity > DEFAULT_LOAD_FACTOR) {
+      // Overloaded, so double the capacity and re-insert all the values
+      capacity *= 2;
+      Object[] newEntries = new Object[capacity];
+      load = 0;
+
+      for (Map.Entry<K, V> entry : entrySet()) {
+        int index = getIndex(entry.getKey());
+
+        // Initialize the linked list if the entry is null
+        if (newEntries[index] == null) {
+          newEntries[index] = new BLMLinkedList<BLMEntry<K, V>>();
+          load++;
+        }
+
+        // Add our map entry to the linked list at the index
+        BLMLinkedList<BLMEntry<K, V>> entryList =
+            (BLMLinkedList<BLMEntry<K, V>>)newEntries[index];
+        entryList.add(new BLMEntry<K, V>(entry.getKey(), entry.getValue()));
+      }
+
+      // Reset the entries array
+      entries = newEntries;
+    }
+
     BLMEntry<K, V> toAdd = new BLMEntry<K, V>(key, value);
     int index = getIndex(key);
 
@@ -158,9 +190,11 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
         oldValue = entry.getValue();
         entryList.remove(entry);
         entrySet.remove(entry);
+        size--;
       }
     }
     entryList.add(toAdd);
+    size++;
 
     keySet.add(key);
     entrySet.add(toAdd);
@@ -193,6 +227,7 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
    */
   @SuppressWarnings("unchecked")
   public V remove(Object key) {
+    // TODO Shrink when sufficiently unloaded?
     int index = getIndex(key);
 
     if (entries[index] != null) {
@@ -203,9 +238,12 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
       for (BLMEntry<K, V> entry : entryList) {
         if (entry.getKey().equals(key)) {
           entryList.remove(entry);
+          keySet.remove(entry.getKey());
+          entrySet.remove(entry);
           size--;
           if (entryList.isEmpty()) {
             entries[index] = null;
+            load--;
           }
           return entry.getValue();
         }
@@ -217,6 +255,14 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
   /** Return the number of mappings in this map */
   public int size() {
     return size;
+  }
+
+  public boolean equals(Object o) {
+    if (o instanceof Map) {
+      Map m = (Map)o;
+      return keySet().equals(m.keySet());
+    }
+    return false;
   }
 
   /**
@@ -360,20 +406,33 @@ public class BLMLinkedHashMap<K, V> extends AbstractMap<K, V>
    */
   private class EntrySet extends AbstractSet<Map.Entry<K, V>>
       implements Set<Map.Entry<K, V>> {
-    // FIXME The types are all messed up. Implementation uses BLMEntry<K, V> but
-    // the API is supposed to use Map.Entry<K, V>. BLMEntry implements
-    // Map.Entry, but still having compatibility issues.
-    HashSet<Map.Entry<K, V>> entries;
+    HashSet<BLMEntry<K, V>> entries;
 
     /** The sole constructor */
     public EntrySet() {
-      // FIXME Incompatible types
-      // entries = BLMLinkedHashMap.this.entrySet;
+      entries = BLMLinkedHashMap.this.entrySet;
     }
 
     /** Return an iterator over the entries in this set */
     public Iterator<Map.Entry<K, V>> iterator() {
-      return entries.iterator();
+      return new Iterator<Map.Entry<K, V>>() {
+        Iterator<BLMEntry<K, V>> itr = entries.iterator();
+
+        /** Remove is not supported */
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+
+        /** Return true if the iterator has another element */
+        public boolean hasNext() {
+          return itr.hasNext();
+        }
+
+        /** Return the next element from the iterator */
+        public Map.Entry<K, V> next() {
+          return itr.next();
+        }
+      };
     }
 
     /** Return true if this set contians an entry */
