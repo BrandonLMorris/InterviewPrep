@@ -6,10 +6,13 @@
 package DataStructures;
 
 
+import java.util.AbstractList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
-public class BLMLinkedList<T> implements Iterable<T> {
+public class BLMLinkedList<T> extends AbstractList<T>
+    implements Iterable<T>, List<T> {
   private int size;
   private Node head, tail;
 
@@ -47,7 +50,7 @@ public class BLMLinkedList<T> implements Iterable<T> {
    * @param index where to add the element
    * @throws java.lang.IndexOutOfBoundsException if the index is out of range
    */
-  public boolean add(int index, T toAdd) {
+  public void add(int index, T toAdd) {
     // Handle the out of bounds case
     if (index < 0 || index > size) {
       throw new IndexOutOfBoundsException();
@@ -55,12 +58,14 @@ public class BLMLinkedList<T> implements Iterable<T> {
 
     // If it's added to the end, use our other method
     if (index == size) {
-      return add(toAdd);
+      add(toAdd);
+      return;
     }
 
     // If it's being added to the front, use our other method
     if (index == 0) {
-      return push(toAdd);
+      push(toAdd);
+      return;
     }
 
     // Traverse the list to the insertion point
@@ -79,7 +84,6 @@ public class BLMLinkedList<T> implements Iterable<T> {
     n.next = current;
 
     size++;
-    return true;
   }
 
   /**
@@ -131,20 +135,20 @@ public class BLMLinkedList<T> implements Iterable<T> {
    * Determine if list contains an element. Relies on the equals() method to
    * determine equality.
    *
-   * @param elem the element to search for
+   * @param o the object to search for
    */
-  public boolean contains(T elem) {
-    return indexOf(elem) != -1;
+  public boolean contains(Object o) {
+    return indexOf(o) != -1;
   }
 
   /** Returns the index of a value in the list or -1 if not present */
-  public int indexOf(T elem) {
+  public int indexOf(Object o) {
     Node current = head;
     int pos = 0;
 
     // Iterate over the list
     while (current != null) {
-      if (current.data.equals(elem)) {
+      if (current.data.equals(o)) {
         return pos;
       }
       current = current.next;
@@ -194,16 +198,17 @@ public class BLMLinkedList<T> implements Iterable<T> {
    * @param index the index to change
    * @throws java.lang.IndexOutOfBoundsException if index is out of range
    */
-  public boolean set(int index, T value) {
+  public T set(int index, T value) {
     // Handle the out of bounds error
     if (index < 0 || index >= size) {
       throw new IndexOutOfBoundsException();
     }
 
     // Handle setting the tail separately (optimization)
-    if (index == size-1) {
+    if (index == size - 1) {
+      T returnValue = tail.data;
       tail.data = value;
-      return true;
+      return returnValue;
     }
 
     // Traverse the list to find the element.
@@ -217,8 +222,9 @@ public class BLMLinkedList<T> implements Iterable<T> {
       current = forward ? current.next : current.prev;
     }
 
+    T returnValue = current.data;
     current.data = value;
-    return true;
+    return returnValue;
   }
 
   /** Delete and return the last element in the list */
@@ -288,13 +294,13 @@ public class BLMLinkedList<T> implements Iterable<T> {
     return current.data;
   }
 
-  public T remove(T value) {
+  public boolean remove(Object value) {
     int index = indexOf(value);
     if (index != -1) {
       remove(index);
-      return value;
+      return true;
     }
-    return null;
+    return false;
   }
 
   /** Return true if the list contains no elements */
