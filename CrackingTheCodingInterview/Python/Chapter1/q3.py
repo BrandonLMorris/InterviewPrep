@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """Solution to question 3 of chapter 1"""
 
-from collections import defaultdict
-
 def is_perm(s1, s2):
     """Return true if s1 is a permutation of s2, assuming spaces count"""
-    if len(s1) != len(s2): return False
+    if len(s1) != len(s2):
+        return False
 
-    counts = [0 for i in range(128)]
-    for c in s1: counts[ord(c)] += 1
-    for c in s2: counts[ord(c)] -= 1
+    # Add for occurences in s1, subtract for occurences in s2
+    counts = [0 for _ in range(128)]
+    for c in s1:
+        counts[ord(c)] += 1
+    for c in s2:
+        counts[ord(c)] -= 1
 
+    # Everything should be zero
     return all([x == 0 for x in counts])
 
 if __name__ == '__main__':
