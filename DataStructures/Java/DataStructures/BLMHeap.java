@@ -27,8 +27,9 @@ public class BLMHeap<T extends Comparable<? super T>> {
   /** Construct a new heap from an existing interable */
   public BLMHeap(Iterable<T> list) {
     // Copy the elements into our internal storage
-    @SuppressWarnings("unchecked")
-    T[] arr = (T[])(new Object[DEFAULT_CAPACITY]);
+    //@SuppressWarnings("unchecked")
+    //T[] arr = (T[])(new Object[DEFAULT_CAPACITY]);
+    elements = new Object[DEFAULT_CAPACITY];
     Iterator<T> iterator = list.iterator();
     while (iterator.hasNext()) {
       if (elements.length == size) {
@@ -39,7 +40,7 @@ public class BLMHeap<T extends Comparable<? super T>> {
 
     // Now repair the ordering (slightly faster than maintaining during
     // insertion
-    for (int i = size; i > 0; i--) {
+    for (int i = size; i >= 0; i--) {
       heapify(i);
     }
   }
